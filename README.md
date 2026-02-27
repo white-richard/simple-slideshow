@@ -48,5 +48,6 @@ A caption badge is shown at the bottom of an image when its filename begins with
 Settings can be changed by editing the `Config` dataclass at the top of `simple-slideshow.py`:
 
 ## Fonts
+
 IBM Plex Sans by IBM — licensed under the SIL Open Font License 1.1.
 https://github.com/IBM/plex

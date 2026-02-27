@@ -5,6 +5,7 @@ uv.lock
 *.gif
 *.bmp
 *.webp
+photos/*
 
 
 # Byte-compiled / optimized / DLL files
