@@ -5,7 +5,7 @@ A fullscreen photo slideshow that displays images from a directory, automaticall
 ## Installation
 
 ```bash
-uv venv --python 3.13
+uv venv --python 3.14
 ```
 
 ```bash
