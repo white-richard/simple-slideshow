@@ -187,34 +187,52 @@ class Slideshow:
     def _prev_index(self) -> int:
         return (self.index - 1) % len(self.paths)
 
-    def _load_slide(self, idx: int) -> Slide:
-        return Slide(self.paths[idx], self.screen_w, self.screen_h, self.config)
+    def _load_slide(self, idx: int) -> Slide | None:
+        path = self.paths[idx]
+        try:
+            return Slide(path, self.screen_w, self.screen_h, self.config)
+        except OSError:
+            print(f"[WARN] Could not load image, skipping: {path}")
+            self.paths.pop(idx)
+            return None
 
     def _start_preload(self, idx: int):
         def _load():
-            self._preloaded = self._load_slide(idx)
+            if idx < len(self.paths):
+                self._preloaded = self._load_slide(idx)
 
         self._preload_thread = threading.Thread(target=_load, daemon=True)
         self._preload_thread.start()
 
-    def _get_preloaded(self, expected_idx: int) -> Slide:
+    def _get_preloaded(self, expected_idx: int) -> Slide | None:
         """Return preloaded slide if it matches, else load synchronously."""
         if self._preload_thread:
             self._preload_thread.join(timeout=5)
         if self._preloaded is not None:
             return self._preloaded
-        return self._load_slide(expected_idx)
+        if expected_idx < len(self.paths):
+            return self._load_slide(expected_idx)
+        return None
 
     def _begin_transition(self, target_index: int):
         """Start a crossfade to the slide at target_index."""
         if self.transitioning:
             return
+        if not self.paths:
+            print("[ERROR] No images remaining.")
+            self.running = False
+            return
 
-        next_idx = target_index
+        next_idx = target_index % len(self.paths)
         if next_idx == self._next_index():
             next_slide = self._get_preloaded(next_idx)
         else:
             next_slide = self._load_slide(next_idx)
+
+        # If the slide failed to load, skip ahead to the next one
+        if next_slide is None:
+            self._begin_transition(next_idx)
+            return
 
         self.next_slide = next_slide
         self.transitioning = True
