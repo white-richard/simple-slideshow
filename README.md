@@ -5,14 +5,6 @@ A fullscreen photo slideshow that displays images from a directory, automaticall
 ## Installation
 
 ```bash
-uv venv --python 3.14
-```
-
-```bash
-source .venv/bin/activate
-```
-
-```bash
 uv sync
 ```
 
